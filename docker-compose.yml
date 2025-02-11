@@ -13,7 +13,7 @@ services:
       - PASSWORD=${PASSWORD}
       - URL=${URL}
     env_file:
-      - .env.example
+      - .env
     deploy:
       resources:
         limits:

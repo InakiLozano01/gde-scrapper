@@ -423,6 +423,16 @@ def initialize_driver():
 
 async def async_main():
     try:
+        # Load environment variables
+        load_dotenv()
+        url = os.getenv("URL")
+        if not url:
+            raise ValueError("URL environment variable is not set")
+        if not url.startswith("http"):
+            raise ValueError(f"Invalid URL format: {url}")
+        
+        logger.info(f"Using URL: {url}")
+        
         # Create data directory if it doesn't exist
         data_dir = os.path.join(os.getcwd(), "data")
         os.makedirs(data_dir, exist_ok=True)
@@ -440,36 +450,12 @@ async def async_main():
         os.makedirs(downloads_dir, exist_ok=True)
         logger.info(f"Downloads directory set to: {downloads_dir}")
 
-        # Configure Chrome options
-        chrome_options = Options()
-        chrome_options.add_experimental_option('prefs', {
-            'download.default_directory': downloads_dir,
-            'download.prompt_for_download': False,
-            'download.directory_upgrade': True,
-            'safebrowsing.enabled': True,
-            'profile.default_content_setting_values.automatic_downloads': 1,
-            'profile.content_settings.exceptions.automatic_downloads.*.setting': 1
-        })
-        # Add headless mode and other Docker-specific options
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--window-size=1920,1080')
-        chrome_options.add_argument('--start-maximized')
-        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option('useAutomationExtension', False)
-
-        # Use the system-installed ChromeDriver
-        service = ChromeService(executable_path="/usr/local/bin/chromedriver")
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        driver.implicitly_wait(10)
-
+        # Initialize the driver using our helper function
+        driver = initialize_driver()
+        
         try:
             # Login and navigation
             logger.info("Navigating to login page...")
-            url = os.getenv("URL")
             driver.get(url)
             await asyncio.to_thread(handle_login, driver)
 
