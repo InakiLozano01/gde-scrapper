@@ -123,69 +123,43 @@ def handle_login(driver):
     """Handle login with retries and error handling."""
     max_retries = 3
     retry_count = 0
-    
-    # Load environment variables
-    load_dotenv()  # Make sure we load the env file
-    user = os.getenv("USERNAME")
-    password = os.getenv("PASSWORD")
-    
-    # Debug logging
-    logger.info(f"Attempting login with username: {user[:2]}{'*' * (len(user)-2) if user else 'None'}")
-    if not user or not password:
-        logger.error("Missing credentials in environment variables")
-        raise Exception("USERNAME or PASSWORD environment variables are not set")
-    
     while retry_count < max_retries:
         try:
-            logger.info("Waiting for username field...")
             username_field = WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "[placeholder='Usuario/Cuil/Cuit']"))
             )
             time.sleep(1)
             username_field.clear()
+            user = os.getenv("USERNAME")
             username_field.send_keys(user)
-            logger.info("Username entered successfully")
-
-            logger.info("Waiting for password field...")
+            logger.info("Username entered")
             password_field = WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='password']"))
             )
             time.sleep(1)
             password_field.clear()
+            password = os.getenv("PASSWORD")
             password_field.send_keys(password)
-            logger.info("Password entered successfully")
-
-            logger.info("Waiting for login button...")
+            logger.info("Password entered")
             login_button = WebDriverWait(driver, 15).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Acceder')]"))
             )
             time.sleep(1)
-            
-            # Try different click methods
-            try:
-                logger.info("Attempting to click login button with execute_script")
-                driver.execute_script("arguments[0].click();", login_button)
-            except Exception as e:
-                logger.warning(f"Execute script click failed: {str(e)}, trying regular click")
-                login_button.click()
-            
-            logger.info("Login button clicked, waiting for navigation...")
-            
+            login_button.click()
+            logger.info("Login button clicked")
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".glyphicon-th"))
             )
-            logger.info("Login successful!")
             return True
-            
         except Exception as e:
             logger.error(f"Login attempt {retry_count + 1} failed: {str(e)}")
-            if retry_count < max_retries - 1:
+            retry_count += 1
+            if retry_count < max_retries:
                 logger.info("Refreshing page and retrying login...")
                 driver.refresh()
                 time.sleep(3)
-            retry_count += 1
-            
-    raise Exception("Failed to login after multiple attempts")
+            else:
+                raise Exception("Failed to login after multiple attempts")
 
 def wait_for_downloads_to_complete(driver, directory, timeout=60):
     """Wait for both the browser loading indicators and file downloads to complete."""
@@ -382,13 +356,28 @@ def click_visualizar_option(driver, row, expediente, retries=3):
 def setup_chrome_options():
     """Set up Chrome options for the webdriver."""
     chrome_options = Options()
+    
+    # Basic Chrome settings
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless=new')  # Using the new headless mode
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument('--start-maximized')
+    
+    # Additional options for reliability
+    chrome_options.add_argument('--disable-extensions')
+    chrome_options.add_argument('--disable-popup-blocking')
+    chrome_options.add_argument('--ignore-certificate-errors')
+    chrome_options.add_argument('--no-first-run')
     chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    chrome_options.add_argument('--disable-web-security')
+    chrome_options.add_argument('--allow-running-insecure-content')
+    
+    # Set user agent to look more like a regular browser
+    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36')
+    
+    # Experimental options
     chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     
@@ -398,7 +387,11 @@ def setup_chrome_options():
         'download.default_directory': download_dir,
         'download.prompt_for_download': False,
         'download.directory_upgrade': True,
-        'safebrowsing.enabled': True
+        'safebrowsing.enabled': True,
+        'profile.default_content_setting_values.automatic_downloads': 1,
+        'profile.content_settings.exceptions.automatic_downloads.*.setting': 1,
+        'credentials_enable_service': False,
+        'profile.password_manager_enabled': False
     }
     chrome_options.add_experimental_option('prefs', prefs)
     
