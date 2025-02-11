@@ -10,7 +10,7 @@ services:
     environment:
       - TZ=America/Argentina/Buenos_Aires
     env_file:
-      - .env
+      - .env.example
     deploy:
       resources:
         limits:
