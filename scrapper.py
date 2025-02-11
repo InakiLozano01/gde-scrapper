@@ -51,20 +51,29 @@ def get_number_of_docs():
     
     while True:
         try:
-            sys.stdout.flush()  # Ensure prompt is displayed
-            num = input("Enter number of documents to process: ")
-            print(f"\nYou entered: {num}")  # Echo the input
+            sys.stdout.flush()
+            sys.stdout.write("Enter number of documents to process: ")
+            sys.stdout.flush()
+            num = sys.stdin.readline().strip()
+            sys.stdout.write(f"\nYou entered: {num}\n")
+            sys.stdout.flush()
+            
             num = int(num)
             if num < 0:
-                print("Error: Please enter a non-negative number")
+                sys.stdout.write("Error: Please enter a non-negative number\n")
+                sys.stdout.flush()
                 continue
-            print(f"Will process {num} documents\n")
+                
+            sys.stdout.write(f"Will process {num} documents\n\n")
+            sys.stdout.flush()
             return num
         except ValueError:
-            print("Error: Please enter a valid number")
+            sys.stdout.write("Error: Please enter a valid number\n")
+            sys.stdout.flush()
         except Exception as e:
-            print(f"Error: {str(e)}")
-            print("Please try again")
+            sys.stdout.write(f"Error: {str(e)}\n")
+            sys.stdout.write("Please try again\n")
+            sys.stdout.flush()
 
 def go_to_next_page(driver):
     """Attempt to click the next page button."""

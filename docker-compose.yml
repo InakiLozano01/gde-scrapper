@@ -11,6 +11,7 @@ services:
       - TZ=America/Argentina/Buenos_Aires
       - PYTHONUNBUFFERED=1
       - PYTHONIOENCODING=UTF-8
+      - TERM=xterm
     env_file:
       - .env.example
     deploy:
