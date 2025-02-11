@@ -9,6 +9,9 @@ services:
       - ./data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
+      - USERNAME=${USERNAME}
+      - PASSWORD=${PASSWORD}
+      - URL=${URL}
     env_file:
       - .env.example
     deploy:
@@ -21,4 +24,5 @@ services:
     security_opt:
       - seccomp=unconfined
     cap_add:
-      - SYS_ADMIN 
+      - SYS_ADMIN
+    restart: "no" 
