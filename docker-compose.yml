@@ -12,6 +12,7 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONIOENCODING=UTF-8
       - TERM=xterm
+      - PYTHONDONTWRITEBYTECODE=1
     env_file:
       - .env.example
     deploy:
