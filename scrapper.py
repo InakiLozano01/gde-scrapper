@@ -355,8 +355,12 @@ def click_visualizar_option(driver, row, expediente, retries=3):
 
 async def async_main():
     try:
+        # Create data directory if it doesn't exist
+        data_dir = os.path.join(os.getcwd(), "data")
+        os.makedirs(data_dir, exist_ok=True)
+        
         # Create CSV file for logging processed expedientes
-        csv_file = os.path.join(os.getcwd(), "expedientes.csv")
+        csv_file = os.path.join(data_dir, "expedientes.csv")
         with open(csv_file, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Expediente', 'Downloaded', 'Error'])

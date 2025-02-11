@@ -6,7 +6,7 @@ services:
     tty: true        # docker run -t
     volumes:
       - ./downloads:/app/downloads  # Mount downloads directory
-      - ./expedientes.csv:/app/expedientes.csv  # Mount CSV file for persistence
+      - ./data:/app/data  # Directory for CSV and other data files
     environment:
       - TZ=America/Argentina/Buenos_Aires
     env_file:
