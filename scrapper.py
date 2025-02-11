@@ -4,6 +4,7 @@ import time
 import csv
 import asyncio
 import re
+import sys
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -43,16 +44,27 @@ def wait_for_downloads(directory, timeout=60):
 
 def get_number_of_docs():
     """Prompt the user to enter the number of documents to process."""
+    print("\n=== Document Processing Setup ===")
+    print("Please enter the number of documents you want to process.")
+    print("For example, enter '70' to process 70 documents.")
+    print("Waiting for input...\n")
+    
     while True:
         try:
-            num = input("Enter number of documents to process (e.g., 70): ")
+            sys.stdout.flush()  # Ensure prompt is displayed
+            num = input("Enter number of documents to process: ")
+            print(f"\nYou entered: {num}")  # Echo the input
             num = int(num)
             if num < 0:
-                print("Please enter a non-negative number")
+                print("Error: Please enter a non-negative number")
                 continue
+            print(f"Will process {num} documents\n")
             return num
         except ValueError:
-            print("Please enter a valid number")
+            print("Error: Please enter a valid number")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            print("Please try again")
 
 def go_to_next_page(driver):
     """Attempt to click the next page button."""

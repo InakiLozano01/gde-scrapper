@@ -9,6 +9,8 @@ services:
       - ./data:/app/data  # Directory for CSV and other data files
     environment:
       - TZ=America/Argentina/Buenos_Aires
+      - PYTHONUNBUFFERED=1
+      - PYTHONIOENCODING=UTF-8
     env_file:
       - .env.example
     deploy:
@@ -17,7 +19,7 @@ services:
           memory: 4G
         reservations:
           memory: 2G
-    restart: unless-stopped
+    restart: "no"  # Changed to "no" to prevent auto-restart when stopped
     shm_size: '2gb'  # Increase shared memory for Chrome
     # Add security options for Chrome in Docker
     security_opt:
