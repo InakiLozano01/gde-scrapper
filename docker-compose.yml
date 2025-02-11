@@ -1,0 +1,24 @@
+services:
+  scrapper:
+    build: .
+    container_name: gde-scrapper
+    volumes:
+      - ./downloads:/app/downloads  # Mount downloads directory
+      - ./expedientes.csv:/app/expedientes.csv  # Mount CSV file for persistence
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    restart: unless-stopped
+    shm_size: '2gb'  # Increase shared memory for Chrome
+    # Add security options for Chrome in Docker
+    security_opt:
+      - seccomp=unconfined  # Required for Chrome
+    cap_add:
+      - SYS_ADMIN  # Required for Chrome 
