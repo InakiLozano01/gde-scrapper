@@ -2,6 +2,8 @@ services:
   scrapper:
     build: .
     container_name: gde-scrapper
+    stdin_open: true  # docker run -i
+    tty: true        # docker run -t
     volumes:
       - ./downloads:/app/downloads  # Mount downloads directory
       - ./expedientes.csv:/app/expedientes.csv  # Mount CSV file for persistence
