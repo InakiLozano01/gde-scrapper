@@ -19,12 +19,16 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome Driver
-RUN CHROME_DRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
-    wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver.zip && \
-    chmod +x /usr/local/bin/chromedriver
+# Install ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f 3) && \
+    CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d '.' -f 1) && \
+    echo "Chrome version: $CHROME_VERSION" && \
+    echo "Chrome major version: $CHROME_MAJOR_VERSION" && \
+    wget -q "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROME_VERSION/linux64/chromedriver-linux64.zip" -O /tmp/chromedriver.zip && \
+    unzip /tmp/chromedriver.zip -d /tmp/ && \
+    mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm -rf /tmp/chromedriver*
 
 # Set up working directory
 WORKDIR /app
@@ -45,5 +49,5 @@ RUN mkdir -p downloads
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 
-# Run the script with xvfb-run for headless execution
-CMD ["python", "scrapper.py"] 
+# Run with Python unbuffered mode
+CMD ["python", "-u", "scrapper.py"] 

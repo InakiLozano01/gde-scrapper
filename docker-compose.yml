@@ -2,17 +2,13 @@ services:
   scrapper:
     build: .
     container_name: gde-scrapper
-    stdin_open: true  # docker run -i
-    tty: true        # docker run -t
+    stdin_open: true
+    tty: true
     volumes:
-      - ./downloads:/app/downloads  # Mount downloads directory
-      - ./data:/app/data  # Directory for CSV and other data files
+      - ./downloads:/app/downloads
+      - ./data:/app/data
     environment:
-      - TZ=America/Argentina/Buenos_Aires
       - PYTHONUNBUFFERED=1
-      - PYTHONIOENCODING=UTF-8
-      - TERM=xterm
-      - PYTHONDONTWRITEBYTECODE=1
     env_file:
       - .env.example
     deploy:
@@ -21,10 +17,8 @@ services:
           memory: 4G
         reservations:
           memory: 2G
-    restart: "no"  # Changed to "no" to prevent auto-restart when stopped
-    shm_size: '2gb'  # Increase shared memory for Chrome
-    # Add security options for Chrome in Docker
+    shm_size: '2gb'
     security_opt:
-      - seccomp=unconfined  # Required for Chrome
+      - seccomp=unconfined
     cap_add:
-      - SYS_ADMIN  # Required for Chrome 
+      - SYS_ADMIN 

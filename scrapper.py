@@ -44,49 +44,14 @@ def wait_for_downloads(directory, timeout=60):
 
 def get_number_of_docs():
     """Prompt the user to enter the number of documents to process."""
+    logger.info("Starting document input process")
+    print("Enter number of documents to process (e.g., 35): ", end='', flush=True)
     try:
-        print("\n=== Document Processing Setup ===")
-        print("Please enter the number of documents you want to process.")
-        print("For example, enter '70' to process 70 documents.")
-        print("Waiting for input...\n")
-        
-        while True:
-            try:
-                # Explicitly flush stdout before input
-                sys.stdout.flush()
-                
-                # Get input with a clear prompt
-                print("Enter number of documents to process: ", end='', flush=True)
-                num = input()
-                
-                # Immediately acknowledge receipt of input
-                print(f"\nReceived input: {num}")
-                sys.stdout.flush()
-                
-                # Convert to integer
-                num = int(num)
-                print(f"Successfully converted to integer: {num}")
-                sys.stdout.flush()
-                
-                if num < 0:
-                    print("Error: Please enter a non-negative number")
-                    continue
-                
-                print(f"Will process {num} documents\n")
-                sys.stdout.flush()
-                
-                logger.info(f"User entered number of documents: {num}")
-                return num
-                
-            except ValueError:
-                print("Error: Please enter a valid number")
-                sys.stdout.flush()
-            except Exception as e:
-                print(f"Error: {str(e)}")
-                print("Please try again")
-                sys.stdout.flush()
-    except Exception as e:
-        logger.error(f"Critical error in get_number_of_docs: {str(e)}")
+        num = input().strip()
+        logger.info(f"Received input: {num}")
+        return int(num)
+    except ValueError as e:
+        logger.error(f"Invalid input: {e}")
         raise
 
 def go_to_next_page(driver):
@@ -428,7 +393,8 @@ async def async_main():
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option('useAutomationExtension', False)
 
-        service = ChromeService(ChromeDriverManager().install())
+        # Use the system-installed ChromeDriver
+        service = ChromeService(executable_path="/usr/local/bin/chromedriver")
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.implicitly_wait(10)
 
