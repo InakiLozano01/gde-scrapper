@@ -1,3 +1,5 @@
 .env
 .env.example
 /data/expedientes.csv
+/downloads/*
+/*.xlsx
